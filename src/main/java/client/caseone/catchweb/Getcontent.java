@@ -19,7 +19,6 @@ public class Getcontent {
         //取出網頁全部內容
         String content = new String();
 
-
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpget = new HttpGet(url);
         //以get請求
@@ -51,6 +50,27 @@ public class Getcontent {
 
 
 
+
+    private static long getDateTimeForThreeDay() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DATE, -3);
+        return cal.getTimeInMillis();
+    }
+
+    private static long getRepoTime(String dateTime) {
+        Date date = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        try {
+            date = sdf.parse(dateTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime();
+    }
+
+
+
     public static List<Map<String, String>> sortIndexTolist(String content) throws ParseException {
         //整理內容,回傳List
         String regex = "<div class=\"c-listTableTd__title\">[\\s\\S]*?<a href=\"(\\w+\\.\\w+.f=\\w+&t=\\w+)\"\\s"
@@ -60,18 +80,12 @@ public class Getcontent {
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
         Pattern pa = Pattern.compile(regex,Pattern.CASE_INSENSITIVE);
         //設定比對的模式
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Matcher ma = pa.matcher(content);
-
-
 
 
         while (ma.find()) {
 
-
-
-            int fish = 0;
-            if (fish == 0) {
+            if (getRepoTime(ma.group(4))>getDateTimeForThreeDay()) {
 
                 Map<String, String> map = new HashMap<String, String>();
                 map.put("標題", ma.group(2));
